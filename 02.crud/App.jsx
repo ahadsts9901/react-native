@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Entypo, Feather } from '@expo/vector-icons';
+import { MD3LightTheme as DefaultTheme, PaperProvider, Modal, Portal, Button } from 'react-native-paper';
 
 export default function App() {
 
@@ -14,8 +15,19 @@ export default function App() {
     return null
   }
 
+  const theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#45a29e',
+      secondary: '#45a29e',
+    },
+  };
+
   const [inputValue, setInputValue] = useState("")
-  const [todos, setTodos] = useState([{ text: "koko" }, { text: "koko" }, { text: "koko" }])
+  const [todos, setTodos] = useState(["hi", "hello", "rbye"])
+  const [showModal, setShowModal] = useState(false)
+  const [ind, setInd] = useState()
 
   const handleInputChange = (text) => {
     setInputValue(text);
@@ -25,43 +37,78 @@ export default function App() {
 
     if (!inputValue || inputValue.trim() === "") return
 
-    const newTodo = {
-      text: inputValue,
-      id: todos.length + 1
-    }
-
-    setTodos([newTodo, ...todos])
+    setTodos([inputValue, ...todos])
     setInputValue("")
 
   }
 
+  const del = (id) => {
+    const updatedTodos = [...todos];
+    updatedTodos.splice(id, 1);
+    setTodos(updatedTodos);
+    setShowModal(false)
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.head}>
-        <MaterialCommunityIcons name="star-three-points" size={32} color="#45a29e" />
-        <Text style={styles.h1}>React Native Todo</Text>
-      </View>
-      <View style={styles.form}>
-        <TextInput style={styles.input} placeholder='Enter Todo...'
-          minLength={1}
-          maxLength={24}
-          value={inputValue}
-          onChangeText={handleInputChange}
-        />
-        <TouchableOpacity style={styles.button} onPress={submit}>
-          <Text style={styles.buttonText}>Add +</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView contentContainerStyle={styles.todos}
-        showsVerticalScrollIndicator={false}
-      >
-        {
-          todos.map((todo, i) => (
-            <View key={i} style={styles._todo}><Text style={styles.todoText}>{todo.text}</Text></View>
-          ))
-        }
-      </ScrollView>
-    </SafeAreaView>
+    <>
+      <PaperProvider theme={theme}>
+        <>
+          {
+            showModal && <Portal>
+              <View style={styles.portal}>
+                <Modal visible={showModal} onDismiss={() => setShowModal(false)} contentContainerStyle={styles.modalStyle}>
+                  <Text style={styles.modalText}>Are you sure to delete?</Text>
+                  <View style={styles.modalButtons}>
+                    <Button style={styles.modalButton} mode="outlined" onPress={() => setShowModal(false)}>
+                      <Text style={styles.modalButtonsText}>No</Text>
+                    </Button>
+                    <Button style={styles.modalButton} mode="contained" onPress={() => del(ind)}>
+                      <Text style={styles.modalButtonsText}>Yes</Text>
+                    </Button>
+                  </View>
+                </Modal>
+              </View>
+            </Portal>
+          }
+        </>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.head}>
+            <MaterialCommunityIcons name="star-three-points" size={32} color="#45a29e" />
+            <Text style={styles.h1}>React Native Todo</Text>
+          </View>
+          <View style={styles.form}>
+            <TextInput style={styles.input} placeholder='Enter Todo...'
+              minLength={1}
+              maxLength={18}
+              value={inputValue}
+              onChangeText={handleInputChange}
+            />
+            <Button style={styles.button} icon="plus" mode="contained" onPress={submit}>
+              <Text style={styles.buttonText}>Add</Text>
+            </Button>
+          </View>
+          <ScrollView contentContainerStyle={styles.todos}
+            showsVerticalScrollIndicator={false}
+          >
+            {
+              todos.map((todo, i) => (
+                <View key={i} style={styles._todo}>
+                  <Text style={styles.todoText}>{todo}</Text>
+                  <TouchableOpacity style={styles.todoButton}><Feather name="edit-2" size={18} color="#fefefe" /></TouchableOpacity>
+                  <TouchableOpacity style={styles.todoButton}
+                    onPress={() => {
+                      setShowModal(true)
+                      setInd(i)
+                    }}
+                  ><Entypo name="cross" size={26} color="#fefefe" />
+                  </TouchableOpacity>
+                </View>
+              ))
+            }
+          </ScrollView>
+        </SafeAreaView>
+      </PaperProvider>
+    </>
   );
 }
 
@@ -94,23 +141,21 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#fefefe",
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     color: "#0b0c10",
     flex: 1,
-    borderRadius: 8,
+    borderRadius: 100,
     fontSize: 18,
     fontFamily: "SpaceMonoBold",
   },
   button: {
-    color: "#fefefe",
-    backgroundColor: "#45a29e",
-    borderRadius: 8,
-    padding: 14
+    paddingVertical: 6,
+    borderRadius: 100,
   },
   buttonText: {
-    color: "#0b0c10",
     fontFamily: "SpaceMonoBold",
-    fontSize: 18
+    fontSize: 16,
   },
   todos: {
     display: "flex",
@@ -121,13 +166,53 @@ const styles = StyleSheet.create({
   todoText: {
     fontFamily: "SpaceMonoRegular",
     color: "#fefefe",
-    width: "100%",
-    display: "flex"
+    fontSize: 18,
+    width: 200,
   },
   _todo: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    padding: 12
+    padding: 8,
+  },
+  portal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalStyle: {
+    height: 200,
+    backgroundColor: "#fefefe",
+    width: "80%",
+    margin: "10%",
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    padding: 24,
+    paddingTop: 40,
+    gap: 16
+  },
+  modalText: {
+    fontSize: 18,
+    fontFamily: "SpaceMonoBold",
+    flex: 1,
+    textAlign: "center",
+    lineHeight: 32,
+  },
+  modalButtons: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 16
+  },
+  modalButton:{
+    height: 40,
+    borderRadius: 100,
+  },
+  modalButtonsText: {
+    fontFamily: "SpaceMonoBold",
+    fontSize: 14,
   }
 });
