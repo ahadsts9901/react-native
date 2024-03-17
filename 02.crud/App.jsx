@@ -25,7 +25,7 @@ export default function App() {
   };
 
   const [inputValue, setInputValue] = useState("")
-  const [todos, setTodos] = useState(["hi", "hello", "rbye"])
+  const [todos, setTodos] = useState([])
   const [showDelModal, setShowDelModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [ind, setInd] = useState()
