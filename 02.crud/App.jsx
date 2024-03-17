@@ -33,7 +33,7 @@ export default function App() {
   const [editedInputValue, setEditedInputValue] = useState()
 
   const handleInputChange = (text) => {
-    setEditedInputValue(text);
+    setInputValue(text);
   };
 
   const submit = () => {
