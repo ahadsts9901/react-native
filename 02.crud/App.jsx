@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons, Entypo, Feather } from '@expo/vector-icons';
@@ -26,11 +26,14 @@ export default function App() {
 
   const [inputValue, setInputValue] = useState("")
   const [todos, setTodos] = useState(["hi", "hello", "rbye"])
-  const [showModal, setShowModal] = useState(false)
+  const [showDelModal, setShowDelModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [ind, setInd] = useState()
+  const [editInd, setEditInd] = useState()
+  const [editedInputValue, setEditedInputValue] = useState()
 
   const handleInputChange = (text) => {
-    setInputValue(text);
+    setEditedInputValue(text);
   };
 
   const submit = () => {
@@ -46,7 +49,18 @@ export default function App() {
     const updatedTodos = [...todos];
     updatedTodos.splice(id, 1);
     setTodos(updatedTodos);
-    setShowModal(false)
+    setShowDelModal(false)
+  }
+
+  const handleEditInputChange = (text) => {
+    setEditedInputValue(text)
+  }
+
+  const edit = (id, newText) => {
+    const updatedTodos = [...todos];
+    updatedTodos[id] = newText;
+    setTodos(updatedTodos);
+    setShowEditModal(false);
   }
 
   return (
@@ -54,12 +68,12 @@ export default function App() {
       <PaperProvider theme={theme}>
         <>
           {
-            showModal && <Portal>
+            showDelModal && <Portal>
               <View style={styles.portal}>
-                <Modal visible={showModal} onDismiss={() => setShowModal(false)} contentContainerStyle={styles.modalStyle}>
+                <Modal visible={showDelModal} onDismiss={() => setShowDelModal(false)} contentContainerStyle={styles.modalStyle}>
                   <Text style={styles.modalText}>Are you sure to delete?</Text>
                   <View style={styles.modalButtons}>
-                    <Button style={styles.modalButton} mode="outlined" onPress={() => setShowModal(false)}>
+                    <Button style={styles.modalButton} mode="outlined" onPress={() => setShowDelModal(false)}>
                       <Text style={styles.modalButtonsText}>No</Text>
                     </Button>
                     <Button style={styles.modalButton} mode="contained" onPress={() => del(ind)}>
@@ -71,42 +85,75 @@ export default function App() {
             </Portal>
           }
         </>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.head}>
-            <MaterialCommunityIcons name="star-three-points" size={32} color="#45a29e" />
-            <Text style={styles.h1}>React Native Todo</Text>
-          </View>
-          <View style={styles.form}>
-            <TextInput style={styles.input} placeholder='Enter Todo...'
-              minLength={1}
-              maxLength={18}
-              value={inputValue}
-              onChangeText={handleInputChange}
-            />
-            <Button style={styles.button} icon="plus" mode="contained" onPress={submit}>
-              <Text style={styles.buttonText}>Add</Text>
-            </Button>
-          </View>
-          <ScrollView contentContainerStyle={styles.todos}
-            showsVerticalScrollIndicator={false}
-          >
-            {
-              todos.map((todo, i) => (
-                <View key={i} style={styles._todo}>
-                  <Text style={styles.todoText}>{todo}</Text>
-                  <TouchableOpacity style={styles.todoButton}><Feather name="edit-2" size={18} color="#fefefe" /></TouchableOpacity>
-                  <TouchableOpacity style={styles.todoButton}
-                    onPress={() => {
-                      setShowModal(true)
-                      setInd(i)
-                    }}
-                  ><Entypo name="cross" size={26} color="#fefefe" />
-                  </TouchableOpacity>
-                </View>
-              ))
-            }
-          </ScrollView>
-        </SafeAreaView>
+        <>
+          {
+            showEditModal && <Portal>
+              <View style={styles.portal}>
+                <Modal visible={showEditModal} onDismiss={() => setShowEditModal(false)} contentContainerStyle={styles.modalStyle}>
+                  <Text style={styles.modalText}>Edit Todo...</Text>
+                  <TextInput style={styles.editInput} placeholder='Edit Todo...'
+                    minLength={1}
+                    maxLength={18}
+                    onChangeText={handleEditInputChange}
+                    defaultValue={editedInputValue}
+                  />
+                  <View style={styles.modalButtons}>
+                    <Button style={styles.modalButton} mode="outlined" onPress={() => setShowEditModal(false)}>
+                      <Text style={styles.modalButtonsText}>Cancel</Text>
+                    </Button>
+                    <Button style={styles.modalButton} mode="contained" onPress={() => edit(editInd, editedInputValue)}>
+                      <Text style={styles.modalButtonsText}>Edit</Text>
+                    </Button>
+                  </View>
+                </Modal>
+              </View>
+            </Portal>
+          }
+        </>
+        <>
+          <SafeAreaView style={styles.container}>
+            <View style={styles.head}>
+              <MaterialCommunityIcons name="star-three-points" size={32} color="#45a29e" />
+              <Text style={styles.h1}>React Native Todo</Text>
+            </View>
+            <View style={styles.form}>
+              <TextInput style={styles.input} placeholder='Enter Todo...'
+                minLength={1}
+                maxLength={18}
+                value={inputValue}
+                onChangeText={handleInputChange}
+              />
+              <Button style={styles.button} icon="plus" mode="contained" onPress={submit}>
+                <Text style={styles.buttonText}>Add</Text>
+              </Button>
+            </View>
+            <ScrollView contentContainerStyle={styles.todos}
+              showsVerticalScrollIndicator={false}
+            >
+              {
+                todos.map((todo, i) => (
+                  <View key={i} style={styles._todo}>
+                    <Text style={styles.todoText}>{todo}</Text>
+                    <TouchableOpacity style={styles.todoButton}
+                      onPress={() => {
+                        setShowEditModal(true)
+                        setEditInd(i)
+                        setEditedInputValue(todo)
+                      }}
+                    ><Feather name="edit-2" size={18} color="#fefefe" /></TouchableOpacity>
+                    <TouchableOpacity style={styles.todoButton}
+                      onPress={() => {
+                        setShowDelModal(true)
+                        setInd(i)
+                      }}
+                    ><Entypo name="cross" size={26} color="#fefefe" />
+                    </TouchableOpacity>
+                  </View>
+                ))
+              }
+            </ScrollView>
+          </SafeAreaView>
+        </>
       </PaperProvider>
     </>
   );
@@ -182,7 +229,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalStyle: {
-    height: 200,
+    height: 230,
     backgroundColor: "#fefefe",
     width: "80%",
     margin: "10%",
@@ -207,12 +254,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16
   },
-  modalButton:{
+  modalButton: {
     height: 40,
     borderRadius: 100,
   },
   modalButtonsText: {
     fontFamily: "SpaceMonoBold",
     fontSize: 14,
+  },
+  editInput: {
+    backgroundColor: "#fefefe",
+    padding: 24,
+    color: "#0b0c10",
+    fontSize: 18,
+    fontFamily: "SpaceMonoBold",
+    width: "100%",
+    marginBottom: 10,
   }
 });
