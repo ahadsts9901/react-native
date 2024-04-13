@@ -1,18 +1,19 @@
-import { Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import MIcon from "react-native-vector-icons/MaterialIcons"
 import wave from "../../assets/images/wave.png"
 import { useNavigation } from '@react-navigation/native'
 import { ScrollView } from 'react-native'
-import { emailPattern } from '../core'
+import { baseUrl, emailPattern } from '../core'
+import axios from 'axios'
 
 export default function Signup() {
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showRepeatPassword, setShowRepeatPassword] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
-
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -61,6 +62,33 @@ export default function Signup() {
       }, 1500)
       return
     }
+
+    try {
+      setIsLoading(true)
+      const resp = await axios.post(
+        `${baseUrl}/api/auth/signup`,
+        {
+          email: email,
+          password: password,
+          firstName: username,
+          lastName: "null"
+        },
+        { withCredentials: true }
+      )
+      
+      setIsLoading(false)
+
+      navigation.navigate("Home")
+
+    } catch (error: any) {
+      console.log(error);
+      setIsLoading(false)
+      setErrorMessage(error?.response?.data?.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 2000);
+    }
+
   }
 
   return (
@@ -89,6 +117,7 @@ export default function Signup() {
             fontFamily: "Jost-SemiBold",
             fontSize: 20,
             textAlign: "center",
+            textTransform: "capitalize"
           }}>{errorMessage}</Text>
         </View>
       }
@@ -141,9 +170,16 @@ export default function Signup() {
         <View style={{ width: "100%", flexDirection: "row-reverse", paddingHorizontal: 24 }}>
           <TouchableOpacity
             onPress={signup}
-            style={{ width: 150, backgroundColor: "#f04e5d", borderRadius: 100, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8 }}>
-            <Text style={{ fontFamily: "Jost-SemiBold", fontSize: 20, color: "#fff" }}>Signup</Text>
-            <Icon name="arrow-right-thick" size={28} color="#fff" />
+            style={{ width: 180, backgroundColor: isLoading ? "#555" : "#f04e5d", borderRadius: 100, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8 }}>
+            <Text style={{ fontFamily: "Jost-SemiBold", fontSize: 20, color: "#fff" }}>
+              {
+                isLoading ? "Processing" : "Signup"
+              }
+            </Text>
+            {
+              isLoading ? <ActivityIndicator size="small" color="#fff" />
+                : <Icon name="arrow-right-thick" size={28} color="#fff" />
+            }
           </TouchableOpacity>
         </View>
         <View style={{ width: "100%", flexDirection: "row", marginTop: 16, justifyContent: "center", alignItems: "center", gap: 8, }}>

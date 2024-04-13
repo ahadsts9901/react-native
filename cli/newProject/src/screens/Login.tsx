@@ -1,15 +1,16 @@
-import { Image, KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import wave from "../../assets/images/wave.png"
 import { useNavigation } from '@react-navigation/native'
-import { emailPattern } from '../core'
+import { baseUrl, emailPattern } from '../core'
+import axios from 'axios'
 
 export default function Login() {
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
-
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -21,7 +22,7 @@ export default function Login() {
       setErrorMessage("Email is required")
       setTimeout(() => {
         setErrorMessage(null)
-      }, 1500)
+      }, 2000)
       return
     }
 
@@ -29,7 +30,7 @@ export default function Login() {
       setErrorMessage("Email is invalid")
       setTimeout(() => {
         setErrorMessage(null)
-      }, 1500)
+      }, 2000)
       return
     }
 
@@ -37,10 +38,38 @@ export default function Login() {
       setErrorMessage("Password is required")
       setTimeout(() => {
         setErrorMessage(null)
-      }, 1500)
+      }, 2000)
       return
     }
 
+    try {
+      setIsLoading(true)
+      const resp = await axios.post(
+        `${baseUrl}/api/auth/login`,
+        {
+          email: email,
+          password: password
+        },
+        { withCredentials: true }
+      )
+
+      setIsLoading(false)
+      
+      navigation.navigate("Home")
+
+    } catch (error: any) {
+      console.log(error);
+      setIsLoading(false)
+      setErrorMessage(error?.response?.data?.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 2000);
+    }
+
+  }
+
+  const stop = () => {
+    return
   }
 
   return (
@@ -69,6 +98,7 @@ export default function Login() {
             fontFamily: "Jost-SemiBold",
             fontSize: 20,
             textAlign: "center",
+            textTransform: "capitalize"
           }}>{errorMessage}</Text>
         </View>
       }
@@ -105,10 +135,17 @@ export default function Login() {
         </View>
         <View style={{ width: "100%", flexDirection: "row-reverse", paddingHorizontal: 24 }}>
           <TouchableOpacity
-            onPress={login}
-            style={{ width: 150, backgroundColor: "#f04e5d", borderRadius: 100, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8 }}>
-            <Text style={{ fontFamily: "Jost-SemiBold", fontSize: 20, color: "#fff" }}>Login</Text>
-            <Icon name="arrow-right-thick" size={28} color="#fff" />
+            onPress={isLoading ? stop : login}
+            style={{ width: 180, backgroundColor: isLoading ? "#555" : "#f04e5d", borderRadius: 100, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8 }}>
+            <Text style={{ fontFamily: "Jost-SemiBold", fontSize: 20, color: "#fff" }}>
+              {
+                isLoading ? "Processing" : "Login"
+              }
+            </Text>
+            {
+              isLoading ? <ActivityIndicator color="#fff" size="small" />
+                : <Icon name="arrow-right-thick" size={28} color="#fff" />
+            }
           </TouchableOpacity>
         </View>
         <View style={{ width: "100%", flexDirection: "row", marginTop: 24, justifyContent: "center", alignItems: "center", gap: 8, }}>
