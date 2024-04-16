@@ -10,6 +10,9 @@ import axios from "axios";
 import { baseUrl } from "./core";
 import { login, logout } from "./redux/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EIcon from "react-native-vector-icons/Entypo";
+import { View } from "react-native";
+import Chat from "./screens/Chat";
 
 const Stack = createNativeStackNavigator()
 
@@ -49,9 +52,29 @@ export default function App() {
               animation: "slide_from_right"
             }}
           >
-            <Stack.Screen name="Home" component={Home}
+            <Stack.Screen component={Home} name="Home"
               options={{
-                headerShown: false
+                title: "Native Chat",
+                headerTitleStyle: {
+                  fontFamily: "Jost-SemiBold",
+                  fontSize: 20,
+                  color: "#444"
+                },
+                headerLeft: () => (
+                  <View style={{ marginRight: 16, marginVertical: 18 }}>
+                    <EIcon name="chat" size={32} color="#444" />
+                  </View>
+                ),
+              }}
+            />
+            <Stack.Screen component={Chat} name="Chat"
+              options={{
+                title: "Native Chat",
+                headerTitleStyle: {
+                  fontFamily: "Jost-SemiBold",
+                  fontSize: 20,
+                  color: "#444"
+                },
               }}
             />
           </Stack.Navigator> : null
