@@ -8,6 +8,8 @@ import { ScrollView } from 'react-native'
 import { baseUrl, emailPattern } from '../core'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useDispatch } from 'react-redux'
+import { login } from '../redux/user'
 
 export default function Signup() {
 
@@ -21,6 +23,7 @@ export default function Signup() {
   const [repeatPassword, setRepeatPassword] = useState("")
 
   const navigation: any = useNavigation()
+  const dispatch = useDispatch()
 
   const signup = async () => {
 
@@ -66,20 +69,22 @@ export default function Signup() {
 
     try {
       setIsLoading(true)
+      
       const resp = await axios.post(
         `${baseUrl}/api/auth/signup`,
         {
           email: email,
           password: password,
-          firstName: username,
-          lastName: "null"
+          userName: username,
         },
         { withCredentials: true }
       )
-      
-      setIsLoading(false)
 
-      await AsyncStorage.setItem('hart', resp?.data?.data)
+      await AsyncStorage.setItem('hart', resp?.data?.hart)
+
+      dispatch(login(resp?.data?.data))
+
+      setIsLoading(false)
 
       navigation.navigate("Home")
 

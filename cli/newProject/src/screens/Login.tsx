@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native'
 import { baseUrl, emailPattern } from '../core'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { login } from '../redux/user'
 
 export default function Login() {
 
@@ -16,8 +18,9 @@ export default function Login() {
   const [password, setPassword] = useState("")
 
   const navigation: any = useNavigation()
+  const dispatch = useDispatch()
 
-  const login = async () => {
+  const _login = async () => {
 
     if (!email || email.trim() === "") {
       setErrorMessage("Email is required")
@@ -56,7 +59,9 @@ export default function Login() {
         { withCredentials: true }
       )
 
-      await AsyncStorage.setItem('hart', resp?.data?.data)
+      await AsyncStorage.setItem('hart', resp?.data?.hart)
+
+      dispatch(login(resp?.data?.data))
 
       setIsLoading(false)
 
@@ -140,7 +145,7 @@ export default function Login() {
         </View>
         <View style={{ width: "100%", flexDirection: "row-reverse", paddingHorizontal: 24 }}>
           <TouchableOpacity
-            onPress={isLoading ? stop : login}
+            onPress={isLoading ? stop : _login}
             style={{ width: 180, backgroundColor: isLoading ? "#555" : "#f04e5d", borderRadius: 100, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8 }}>
             <Text style={{ fontFamily: "Jost-SemiBold", fontSize: 20, color: "#fff" }}>
               {

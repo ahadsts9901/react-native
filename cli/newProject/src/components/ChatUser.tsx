@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 
 export default function ChatUser({ item }: any) {
 
-    const { firstName, _id } = item
+    const { userName, _id } = item
 
     const navigation: any = useNavigation()
 
@@ -27,10 +27,10 @@ export default function ChatUser({ item }: any) {
             }} />
             <Text style={{
                 width: "100%",
-                fontSize: 18,
+                fontSize: 20,
                 color: "#555",
                 fontFamily: "Jost-SemiBold"
-            }}>{firstName}</Text>
+            }}>@{userName}</Text>
         </TouchableOpacity>
     )
 }
