@@ -102,11 +102,10 @@ export default function App() {
             />
             <Stack.Screen component={Chat} name="Chat"
               options={{
-                title: "Native Chat",
                 headerTitleStyle: {
                   fontFamily: "Jost-SemiBold",
-                  fontSize: 20,
-                  color: "#444"
+                  fontSize: 22,
+                  color: "#444",
                 },
               }}
             />
