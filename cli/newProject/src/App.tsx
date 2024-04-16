@@ -36,7 +36,7 @@ export default function App() {
       dispatch(login(resp.data.data))
     } catch (error: any) {
       dispatch(logout(null))
-      console.log(error.response.data);
+      console.log(error?.response?.data);
     }
   }
 

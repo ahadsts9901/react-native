@@ -6,8 +6,6 @@ export default function Home() {
 
   const currentUser = useSelector((state: { user: {} }) => state.user)
 
-  console.log(currentUser);
-
   return (
     <View>
       <Text>Home</Text>
