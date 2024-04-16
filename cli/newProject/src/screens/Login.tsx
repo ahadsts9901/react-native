@@ -1,9 +1,10 @@
-import { ActivityIndicator, Image, KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import wave from "../../assets/images/wave.png"
 import { useNavigation } from '@react-navigation/native'
 import { baseUrl, emailPattern } from '../core'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 
 export default function Login() {
@@ -43,7 +44,9 @@ export default function Login() {
     }
 
     try {
+
       setIsLoading(true)
+
       const resp = await axios.post(
         `${baseUrl}/api/auth/login`,
         {
@@ -53,8 +56,10 @@ export default function Login() {
         { withCredentials: true }
       )
 
+      await AsyncStorage.setItem('hart', resp?.data?.data)
+
       setIsLoading(false)
-      
+
       navigation.navigate("Home")
 
     } catch (error: any) {

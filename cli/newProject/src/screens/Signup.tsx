@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ScrollView } from 'react-native'
 import { baseUrl, emailPattern } from '../core'
 import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Signup() {
 
@@ -77,6 +78,8 @@ export default function Signup() {
       )
       
       setIsLoading(false)
+
+      await AsyncStorage.setItem('hart', resp?.data?.data)
 
       navigation.navigate("Home")
 
