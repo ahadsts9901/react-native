@@ -7,6 +7,7 @@ import RNShake from "react-native-shake"
 const App = () => {
 
   const [_torch, set_torch] = useState(false)
+  const [is_shaked, set_is_shaked] = useState("shake not detected")
 
   const openCamera = async () => {
     const result = await launchCamera({ includeBase64: true })
@@ -23,7 +24,10 @@ const App = () => {
 
   useEffect(() => {
     const subscription = RNShake.addListener(() => {
-      console.log("shake detected")
+      set_is_shaked("shake detected for 5 seconds")
+      setTimeout(() => {
+        set_is_shaked("shake not detected")
+      }, 5000)
     });
 
     return () => {
@@ -36,6 +40,7 @@ const App = () => {
       <TouchableOpacity onPress={openCamera} style={{ padding: 16, paddingHorizontal: 32, backgroundColor: "#fff", borderRadius: 100 }}><Text style={{ color: "maroon", fontSize: 24, width: "100%", textAlign: "center" }}>Open Camera</Text></TouchableOpacity>
       <TouchableOpacity onPress={openGallery} style={{ padding: 16, paddingHorizontal: 32, backgroundColor: "#fff", borderRadius: 100 }}><Text style={{ color: "maroon", fontSize: 24, width: "100%", textAlign: "center" }}>Open Gallery</Text></TouchableOpacity>
       <TouchableOpacity onPress={toggleTorch} style={{ padding: 16, paddingHorizontal: 32, backgroundColor: "#fff", borderRadius: 100 }}><Text style={{ color: "maroon", fontSize: 24, width: "100%", textAlign: "center" }}>Torch is {!_torch ? "ON" : "OFF"}</Text></TouchableOpacity>
+      <Text style={{ color: "#fff", fontSize: 24, width: "100%", textAlign: "center" }}>{is_shaked}</Text>
     </SafeAreaView>
   )
 }
