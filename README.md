@@ -6,3 +6,6 @@
 <br />
 <br />
 [Youtube Playlist With React Native CLI ( Recommended ) ](https://youtube.com/playlist?list=PLRAV69dS1uWSjBBJ-egNNOd4mdblt1P4c&si=Nlch0zQg-Je_6Y7s)
+<br/>
+<br/>
+[Youtube Live Classes Native CLI ( Recommended ) ](https://www.youtube.com/live/OwkryPPz3Vc?si=StkgtlWOfSXWM7U3)
